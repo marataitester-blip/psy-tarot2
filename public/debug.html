@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Diagnostics | SoulTarot</title>
+    <style>
+        body {
+            background-color: #0f0f14;
+            color: #c7a87b;
+            font-family: 'Courier New', Courier, monospace;
+            display: flex;
+            flex-col: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            width: 100%;
+            border: 1px solid #c7a87b;
+            padding: 20px;
+            box-shadow: 0 0 15px rgba(199, 168, 123, 0.2);
+            background: rgba(0, 0, 0, 0.8);
+        }
+        h1 {
+            text-align: center;
+            border-bottom: 1px solid #c7a87b;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        button {
+            background: transparent;
+            color: #c7a87b;
+            border: 1px solid #c7a87b;
+            padding: 15px 30px;
+            font-size: 16px;
+            font-family: inherit;
+            cursor: pointer;
+            width: 100%;
+            text-transform: uppercase;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        button:hover {
+            background: #c7a87b;
+            color: #0f0f14;
+            box-shadow: 0 0 10px #c7a87b;
+        }
+        #console-output {
+            margin-top: 20px;
+            background: #000;
+            border: 1px solid #333;
+            padding: 15px;
+            min-height: 200px;
+            white-space: pre-wrap;
+            overflow-x: auto;
+            color: #00ff00; /* Classic terminal green for raw logs */
+            font-size: 14px;
+            line-height: 1.4;
+        }
+        .status-pass { color: #4caf50; font-weight: bold; }
+        .status-fail { color: #f44336; font-weight: bold; }
+        .status-warn { color: #ff9800; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>System Diagnostics Protocol</h1>
+    <p style="text-align: center; margin-bottom: 20px; opacity: 0.7;">Vercel Environment & Connectivity Check</p>
+    
+    <button id="run-btn" onclick="runDiagnostics()">INITIATE SEQUENCE</button>
+
+    <div id="console-output">Ready to scan...</div>
+</div>
+
+<script>
+    const output = document.getElementById('console-output');
+    const btn = document.getElementById('run-btn');
+
+    function log(message, type = 'info') {
+        const timestamp = new Date().toLocaleTimeString();
+        let prefix = `[${timestamp}] `;
+        
+        output.innerHTML += prefix + message + "\n";
+    }
+
+    async function runDiagnostics() {
+        output.innerHTML = ""; // Clear console
+        btn.disabled = true;
+        btn.innerText = "SCANNING...";
+        
+        log("Connecting to /api/debug endpoint...");
+
+        try {
+            const startTime = performance.now();
+            const response = await fetch('/api/debug');
+            const endTime = performance.now();
+            
+            log(`Network latency: ${(endTime - startTime).toFixed(2)}ms`);
+
+            if (!response.ok) {
+                throw new Error(`HTTP Error: ${response.status} ${response.statusText}`);
+            }
+
+            const data = await response.json();
+            
+            log("----------------------------------------");
+            log("ENVIRONMENT CONFIGURATION:");
+            
+            // Check Keys
+            for (const [key, info] of Object.entries(data.keys)) {
+                let colorClass = info.status === 'PRESENT' ? 'status-pass' : 'status-fail';
+                output.innerHTML += `${key}: <span class="${colorClass}">${info.status}</span> (Mask: ${info.preview})\n`;
+            }
+
+            log("----------------------------------------");
+            log("CONNECTIVITY CHECK:");
+
+            // Check Gemini
+            if (data.connectivity.gemini) {
+                const gem = data.connectivity.gemini;
+                if (gem.status === 'OK') {
+                    output.innerHTML += `Gemini API: <span class="status-pass">ONLINE</span>\n`;
+                    output.innerHTML += `Response: "${gem.modelResponse}"\n`;
+                } else if (gem.status === 'SKIPPED') {
+                    output.innerHTML += `Gemini API: <span class="status-warn">SKIPPED</span> (No Key)\n`;
+                } else {
+                    output.innerHTML += `Gemini API: <span class="status-fail">OFFLINE</span>\n`;
+                    output.innerHTML += `Error: ${gem.message}\n`;
+                }
+            }
+
+            log("----------------------------------------");
+            log("DIAGNOSTICS COMPLETE.");
+
+        } catch (e) {
+            log(`CRITICAL FAILURE: ${e.message}`, 'error');
+            output.innerHTML += `<span class="status-fail">Ensure 'api/debug.js' exists and Vercel Functions are enabled.</span>`;
+        } finally {
+            btn.disabled = false;
+            btn.innerText = "RUN TEST SEQUENCE";
+        }
+    }
+</script>
+
+</body>
+</html>

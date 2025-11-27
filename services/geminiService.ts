@@ -1,32 +1,30 @@
 import { TarotAnalysisResult } from "../types";
 
 export const analyzeSituation = async (userInput: string): Promise<TarotAnalysisResult> => {
-  const response = await fetch('/api/analyze', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ userInput })
-  });
+  // 1. Setup Timeout Logic (9 seconds)
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 9000);
 
-  if (!response.ok) {
-    const errData = await response.json().catch(() => ({}));
-    throw new Error(errData.error || `Server Error: ${response.status}`);
+  try {
+    const response = await fetch('/api/analyze', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userInput }),
+      signal: controller.signal // Link signal to fetch
+    });
+
+    clearTimeout(timeoutId); // Clear timer if successful
+
+    if (!response.ok) {
+      const errData = await response.json().catch(() => ({}));
+      throw new Error(errData.error || `Server Error: ${response.status}`);
+    }
+
+    return response.json();
+  } catch (error: any) {
+    if (error.name === 'AbortError') {
+      throw new Error("Связь с эфиром прервана (Тайм-аут). Попробуйте еще раз.");
+    }
+    throw error;
   }
-
-  return response.json();
-};
-
-export const generateTarotImage = async (imagePrompt: string): Promise<string> => {
-  const response = await fetch('/api/image', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ prompt: imagePrompt })
-  });
-
-  if (!response.ok) {
-     const errData = await response.json().catch(() => ({}));
-     throw new Error(errData.error || `Image Server Error: ${response.status}`);
-  }
-
-  const data = await response.json();
-  return data.imageUrl;
 };

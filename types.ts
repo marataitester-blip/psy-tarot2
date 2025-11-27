@@ -2,6 +2,7 @@ export interface TarotAnalysisResult {
   cardName: string;
   cardId: string;
   deckImageUrl: string;
+  generatedImageUrl: string; // Now returned directly from analysis
   archetype: string;
   interpretation: string;
   imagePrompt: string;

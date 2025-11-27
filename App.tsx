@@ -1,6 +1,6 @@
 import React, { useState, useEffect, ReactNode, ErrorInfo } from 'react';
 import { AppState } from './types';
-import { analyzeSituation, generateTarotImage } from './services/geminiService';
+import { analyzeSituation } from './services/geminiService';
 import { LoadingOverlay } from './components/LoadingOverlay';
 
 // Inline Icons to avoid dependency issues
@@ -131,17 +131,14 @@ const AppContent: React.FC = () => {
     setState(prev => ({ ...prev, step: 'processing', error: null }));
 
     try {
-      // 1. Text Analysis (finds the card and interpretation)
+      // 1. Single API Call for Analysis + Image URL (Fast)
       const analysis = await analyzeSituation(state.userInput);
       
-      // 2. Image Generation (creates the unique personal card)
-      const imageUrl = await generateTarotImage(analysis.imagePrompt);
-
       setState(prev => ({
         ...prev,
         step: 'result',
         analysis,
-        generatedImageUrl: imageUrl
+        generatedImageUrl: analysis.generatedImageUrl
       }));
     } catch (err: any) {
       console.error(err);
@@ -157,6 +154,10 @@ const AppContent: React.FC = () => {
         step: 'input',
         error: errorMessage
       }));
+    } finally {
+      // Safety check: if we are still processing for some reason (rare edge case), stop it.
+      // In this flow, we either went to 'result' or 'input' (error), so 'processing' is gone.
+      // But this block ensures cleanup if we add more states later.
     }
   };
 

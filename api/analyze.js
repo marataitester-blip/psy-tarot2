@@ -1,146 +1,87 @@
-const { GoogleGenAI } = require("@google/genai");
-
-const DECK_URLS = {
-  "fool": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/00_fool.png",
-  "magician": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/01_magician.png",
-  "high_priestess": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/02_high_priestess.png",
-  "empress": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/03_empress.png",
-  "emperor": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/04_emperor.png",
-  "hierophant": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/05_hierophant.png",
-  "lovers": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/06_lovers.png",
-  "chariot": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/07_chariot.png",
-  "justice": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/08_justice.png",
-  "hermit": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/09_hermit.png",
-  "wheel_of_fortune": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/10_wheel_of_fortune.png",
-  "strength": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/11_strength.png",
-  "hanged_man": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/12_hanged_man.png",
-  "death": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/13_death.png",
-  "temperance": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/14_temperance.png",
-  "devil": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/15_devil.png",
-  "tower": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/16_tower.png",
-  "star": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/17_star.png",
-  "moon": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/18_moon.png",
-  "sun": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/19_sun.png",
-  "judgement": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/20_judgement.png",
-  "world": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/21_world.png",
-  "hero": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/22_hero.png",
-  "white_card": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/23_white_card.png",
-  "ace_of_wands": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/wands_01_ace.png",
-  "two_of_wands": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/wands_02_two.png",
-  "three_of_wands": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/wands_03_three.png",
-  "four_of_wands": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/wands_04_four.png",
-  "five_of_wands": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/wands_05_five.png",
-  "six_of_wands": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/wands_06_six.png",
-  "seven_of_wands": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/wands_07_seven.png",
-  "eight_of_wands": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/wands_08_eight.png",
-  "nine_of_wands": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/wands_09_nine.png",
-  "ten_of_wands": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/wands_10_ten.png",
-  "page_of_wands": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/wands_11_page.png",
-  "knight_of_wands": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/wands_12_knight.png",
-  "queen_of_wands": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/wands_13_queen.png",
-  "king_of_wands": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/wands_14_king.png",
-  "ace_of_cups": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/cups_01_ace.png",
-  "two_of_cups": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/cups_02_two.png",
-  "three_of_cups": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/cups_03_three.png",
-  "four_of_cups": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/cups_04_four.png",
-  "five_of_cups": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/cups_05_five.png",
-  "six_of_cups": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/cups_06_six.png",
-  "seven_of_cups": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/cups_07_seven.png",
-  "eight_of_cups": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/cups_08_eight.png",
-  "nine_of_cups": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/cups_09_nine.png",
-  "ten_of_cups": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/cups_10_ten.png",
-  "page_of_cups": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/cups_11_page.png",
-  "knight_of_cups": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/cups_12_knight.png",
-  "queen_of_cups": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/cups_13_queen.png",
-  "king_of_cups": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/cups_14_king.png",
-  "ace_of_swords": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/swords_01_ace.png",
-  "two_of_swords": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/swords_02_two.png",
-  "three_of_swords": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/swords_03_three.png",
-  "four_of_swords": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/swords_04_four.png",
-  "five_of_swords": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/swords_05_five.png",
-  "six_of_swords": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/swords_06_six.png",
-  "seven_of_swords": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/swords_07_seven.png",
-  "eight_of_swords": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/swords_08_eight.png",
-  "nine_of_swords": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/swords_09_nine.png",
-  "ten_of_swords": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/swords_10_ten.png",
-  "page_of_swords": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/swords_11_page.png",
-  "knight_of_swords": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/swords_12_knight.png",
-  "queen_of_swords": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/swords_13_queen.png",
-  "king_of_swords": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/swords_14_king.png",
-  "ace_of_pentacles": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/pentacles_01_ace.png",
-  "two_of_pentacles": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/pentacles_02_two.png",
-  "three_of_pentacles": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/pentacles_03_three.png",
-  "four_of_pentacles": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/pentacles_04_four.png",
-  "five_of_pentacles": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/pentacles_05_five.png",
-  "six_of_pentacles": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/pentacles_06_six.png",
-  "seven_of_pentacles": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/pentacles_07_seven.png",
-  "eight_of_pentacles": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/pentacles_08_eight.png",
-  "nine_of_pentacles": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/pentacles_09_nine.png",
-  "ten_of_pentacles": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/pentacles_10_ten.png",
-  "page_of_pentacles": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/pentacles_11_page.png",
-  "knight_of_pentacles": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/pentacles_12_knight.png",
-  "queen_of_pentacles": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/pentacles_13_queen.png",
-  "king_of_pentacles": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/pentacles_14_king.png",
+// api/analyze.js - ВЕРСИЯ БЕЗ БИБЛИОТЕК (NATIVE FETCH)
+export const config = {
+  runtime: 'edge', // Используем Edge Runtime (быстрее и надежнее для Vercel)
 };
 
-module.exports = async (req, res) => {
+export default async function handler(req) {
+  // Настраиваем заголовки (CORS), чтобы сайт видел ответ
+  const corsHeaders = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type',
+  };
+
+  // Если это просто проверка связи (OPTIONS) - отвечаем ОК
+  if (req.method === 'OPTIONS') {
+    return new Response(null, { status: 200, headers: corsHeaders });
+  }
+
   try {
-    const apiKey = process.env.GEMINI_API_KEY || process.env.API_KEY;
-    if (!apiKey) {
-      return res.status(500).json({ error: "API Key is missing in Vercel Settings (GEMINI_API_KEY or API_KEY)" });
+    // 1. Проверяем ключ
+    const API_KEY = process.env.OPENROUTER_API_KEY;
+    if (!API_KEY) {
+      throw new Error("Ключ API не найден в настройках Vercel");
     }
 
-    const { userInput } = req.body;
-    if (!userInput) {
-       return res.status(400).json({ error: "User input is required" });
-    }
+    // 2. Получаем текст от клиента
+    const { userRequest } = await req.json();
 
-    const ai = new GoogleGenAI({ apiKey });
-    const validIds = Object.keys(DECK_URLS).join(", ");
-
-    const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
-      contents: `
-        Действуй как профессиональный таролог и юнгианский психоаналитик. 
-        Проанализируй следующий запрос пользователя: "${userInput}".
-        
-        1. Выбери ОДНУ карту из колоды "Путь Героя" (включая уникальные карты Hero и White Card), которая наиболее точно отражает суть ситуации или подсознательное состояние.
-        2. ОБЯЗАТЕЛЬНО выбери 'cardId' ТОЛЬКО из этого списка ключей: [${validIds}].
-        3. Опиши психологический архетип этой карты.
-        4. Дай глубокую, персональную психологическую трактовку ситуации через призму этой карты.
-        5. Сформулируй краткий совет.
-        6. Создай детальный промпт для генерации изображения (на английском), который смешивает классическую иконографию этой карты с элементами ситуации пользователя. Стиль: мистический реализм, мрачное фэнтези, кинематографичное освещение, 8k.
-      `,
-      config: {
-        responseMimeType: "application/json",
-        responseSchema: {
-          type: "OBJECT",
-          properties: {
-            cardName: { type: "STRING" },
-            cardId: { type: "STRING", description: "Must be exactly one of the keys provided in the list." },
-            archetype: { type: "STRING" },
-            interpretation: { type: "STRING" },
-            advice: { type: "STRING" },
-            imagePrompt: { type: "STRING" },
-          },
-          required: ["cardName", "cardId", "archetype", "interpretation", "advice", "imagePrompt"],
-        },
-        systemInstruction: "Ты — эмпатичный, мудрый наставник. Твой тон глубокий, спокойный и поддерживающий. Даже если ввод кажется бессмысленным, найди скрытый смысл бессознательного.",
+    // 3. Формируем запрос к OpenRouter (Llama 3 Free)
+    // Мы делаем это вручную, без библиотеки openai
+    const aiResponse = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${API_KEY}`,
+        "Content-Type": "application/json",
+        "HTTP-Referer": "https://mirmag.app", 
       },
+      body: JSON.stringify({
+        model: "meta-llama/llama-3-8b-instruct:free",
+        messages: [
+          {
+            role: "system",
+            content: "Ты — экзистенциальный психолог и эксперт по Таро. Верни ответ СТРОГО в формате JSON: { \"card_name\": \"Название карты (RU)\", \"interpretation\": \"Психологический инсайт (RU, 2-3 фразы)\", \"image_prompt\": \"Surrealism, abstract tarot card description (EN)\" }."
+          },
+          {
+            role: "user",
+            content: userRequest || "Общий прогноз"
+          }
+        ]
+      })
     });
 
-    const text = response.text;
-    if (!text) throw new Error("No response text from AI");
+    if (!aiResponse.ok) {
+      const errText = await aiResponse.text();
+      throw new Error(`Ошибка OpenRouter: ${aiResponse.status} - ${errText}`);
+    }
 
-    const parsed = JSON.parse(text);
+    const aiData = await aiResponse.json();
+    const rawContent = aiData.choices[0].message.content;
+
+    // 4. Чистим ответ (ищем JSON внутри текста)
+    const jsonMatch = rawContent.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) throw new Error("ИИ вернул не JSON: " + rawContent);
     
-    // Attach the deck image URL on the server side
-    parsed.deckImageUrl = DECK_URLS[parsed.cardId] || DECK_URLS['white_card'] || "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/rubashka.png";
+    const result = JSON.parse(jsonMatch[0]);
 
-    res.status(200).json(parsed);
+    // 5. Генерируем ссылку на картинку (Pollinations)
+    const imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(result.image_prompt + " mystical tarot style, 8k, dark gold")}`;
+
+    // 6. Отдаем ответ клиенту
+    return new Response(JSON.stringify({
+      card_name: result.card_name,
+      interpretation: result.interpretation,
+      imageUrl: imageUrl
+    }), {
+      status: 200,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+    });
 
   } catch (error) {
-    console.error("API Error:", error);
-    res.status(500).json({ error: error.message || "Internal Server Error" });
+    console.error(error);
+    return new Response(JSON.stringify({ error: error.message }), {
+      status: 500,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+    });
   }
-};
+}

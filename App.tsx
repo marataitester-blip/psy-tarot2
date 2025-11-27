@@ -39,10 +39,10 @@ const App: React.FC = () => {
     setState(prev => ({ ...prev, step: 'processing', error: null }));
 
     try {
-      // 1. Text Analysis
+      // 1. Text Analysis (finds the card and interpretation)
       const analysis = await analyzeSituation(state.userInput);
       
-      // 2. Image Generation
+      // 2. Image Generation (creates the unique personal card)
       const imageUrl = await generateTarotImage(analysis.imagePrompt);
 
       setState(prev => ({
@@ -151,7 +151,7 @@ const App: React.FC = () => {
             <div className="animate-fade-in flex flex-col xl:flex-row gap-8 xl:gap-12 items-start pb-12">
               
               {/* Visuals Column */}
-              <div className="w-full xl:w-5/12 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-2 gap-4 sticky top-8">
+              <div className="w-full xl:w-5/12 grid grid-cols-2 gap-4 sticky top-8">
                 
                 {/* 1. Deck Card */}
                 <div className="flex flex-col gap-2">
@@ -188,7 +188,7 @@ const App: React.FC = () => {
                    </div>
                 </div>
 
-                <div className="col-span-1 sm:col-span-2 mt-4">
+                <div className="col-span-2 mt-4">
                   <button onClick={reset} className="w-full py-3 px-4 bg-slate-800 hover:bg-slate-700 rounded-lg text-slate-300 transition-colors flex items-center justify-center gap-2 text-sm border border-slate-700">
                     <RotateCw className="w-4 h-4" /> Новый вопрос
                   </button>

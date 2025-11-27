@@ -3,7 +3,7 @@ import { TarotAnalysisResult } from "../types";
 
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
-// Mapping of Card IDs to the provided CDN URLs
+// Complete mapping of Card IDs to the provided CDN URLs
 const DECK_URLS: Record<string, string> = {
   // Majors
   "fool": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/00_fool.png",
@@ -32,73 +32,74 @@ const DECK_URLS: Record<string, string> = {
   "white_card": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/23_white_card.png",
   
   // Wands
-  "ace_wands": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/wands_01_ace.png",
-  "two_wands": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/wands_02_two.png",
-  "three_wands": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/wands_03_three.png",
-  "four_wands": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/wands_04_four.png",
-  "five_wands": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/wands_05_five.png",
-  "six_wands": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/wands_06_six.png",
-  "seven_wands": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/wands_07_seven.png",
-  "eight_wands": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/wands_08_eight.png",
-  "nine_wands": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/wands_09_nine.png",
-  "ten_wands": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/wands_10_ten.png",
-  "page_wands": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/wands_11_page.png",
-  "knight_wands": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/wands_12_knight.png",
-  "queen_wands": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/wands_13_queen.png",
-  "king_wands": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/wands_14_king.png",
+  "ace_of_wands": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/wands_01_ace.png",
+  "two_of_wands": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/wands_02_two.png",
+  "three_of_wands": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/wands_03_three.png",
+  "four_of_wands": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/wands_04_four.png",
+  "five_of_wands": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/wands_05_five.png",
+  "six_of_wands": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/wands_06_six.png",
+  "seven_of_wands": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/wands_07_seven.png",
+  "eight_of_wands": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/wands_08_eight.png",
+  "nine_of_wands": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/wands_09_nine.png",
+  "ten_of_wands": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/wands_10_ten.png",
+  "page_of_wands": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/wands_11_page.png",
+  "knight_of_wands": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/wands_12_knight.png",
+  "queen_of_wands": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/wands_13_queen.png",
+  "king_of_wands": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/wands_14_king.png",
 
   // Cups
-  "ace_cups": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/cups_01_ace.png",
-  "two_cups": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/cups_02_two.png",
-  "three_cups": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/cups_03_three.png",
-  "four_cups": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/cups_04_four.png",
-  "five_cups": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/cups_05_five.png",
-  "six_cups": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/cups_06_six.png",
-  "seven_cups": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/cups_07_seven.png",
-  "eight_cups": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/cups_08_eight.png",
-  "nine_cups": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/cups_09_nine.png",
-  "ten_cups": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/cups_10_ten.png",
-  "page_cups": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/cups_11_page.png",
-  "knight_cups": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/cups_12_knight.png",
-  "queen_cups": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/cups_13_queen.png",
-  "king_cups": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/cups_14_king.png",
+  "ace_of_cups": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/cups_01_ace.png",
+  "two_of_cups": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/cups_02_two.png",
+  "three_of_cups": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/cups_03_three.png",
+  "four_of_cups": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/cups_04_four.png",
+  "five_of_cups": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/cups_05_five.png",
+  "six_of_cups": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/cups_06_six.png",
+  "seven_of_cups": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/cups_07_seven.png",
+  "eight_of_cups": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/cups_08_eight.png",
+  "nine_of_cups": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/cups_09_nine.png",
+  "ten_of_cups": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/cups_10_ten.png",
+  "page_of_cups": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/cups_11_page.png",
+  "knight_of_cups": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/cups_12_knight.png",
+  "queen_of_cups": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/cups_13_queen.png",
+  "king_of_cups": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/cups_14_king.png",
 
   // Swords
-  "ace_swords": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/swords_01_ace.png",
-  "two_swords": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/swords_02_two.png",
-  "three_swords": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/swords_03_three.png",
-  "four_swords": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/swords_04_four.png",
-  "five_swords": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/swords_05_five.png",
-  "six_swords": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/swords_06_six.png",
-  "seven_swords": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/swords_07_seven.png",
-  "eight_swords": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/swords_08_eight.png",
-  "nine_swords": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/swords_09_nine.png",
-  "ten_swords": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/swords_10_ten.png",
-  "page_swords": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/swords_11_page.png",
-  "knight_swords": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/swords_12_knight.png",
-  "queen_swords": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/swords_13_queen.png",
-  "king_swords": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/swords_14_king.png",
+  "ace_of_swords": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/swords_01_ace.png",
+  "two_of_swords": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/swords_02_two.png",
+  "three_of_swords": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/swords_03_three.png",
+  "four_of_swords": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/swords_04_four.png",
+  "five_of_swords": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/swords_05_five.png",
+  "six_of_swords": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/swords_06_six.png",
+  "seven_of_swords": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/swords_07_seven.png",
+  "eight_of_swords": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/swords_08_eight.png",
+  "nine_of_swords": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/swords_09_nine.png",
+  "ten_of_swords": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/swords_10_ten.png",
+  "page_of_swords": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/swords_11_page.png",
+  "knight_of_swords": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/swords_12_knight.png",
+  "queen_of_swords": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/swords_13_queen.png",
+  "king_of_swords": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/swords_14_king.png",
 
   // Pentacles
-  "ace_pentacles": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/pentacles_01_ace.png",
-  "two_pentacles": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/pentacles_02_two.png",
-  "three_pentacles": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/pentacles_03_three.png",
-  "four_pentacles": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/pentacles_04_four.png",
-  "five_pentacles": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/pentacles_05_five.png",
-  "six_pentacles": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/pentacles_06_six.png",
-  "seven_pentacles": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/pentacles_07_seven.png",
-  "eight_pentacles": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/pentacles_08_eight.png",
-  "nine_pentacles": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/pentacles_09_nine.png",
-  "ten_pentacles": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/pentacles_10_ten.png",
-  "page_pentacles": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/pentacles_11_page.png",
-  "knight_pentacles": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/pentacles_12_knight.png",
-  "queen_pentacles": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/pentacles_13_queen.png",
-  "king_pentacles": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/pentacles_14_king.png",
+  "ace_of_pentacles": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/pentacles_01_ace.png",
+  "two_of_pentacles": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/pentacles_02_two.png",
+  "three_of_pentacles": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/pentacles_03_three.png",
+  "four_of_pentacles": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/pentacles_04_four.png",
+  "five_of_pentacles": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/pentacles_05_five.png",
+  "six_of_pentacles": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/pentacles_06_six.png",
+  "seven_of_pentacles": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/pentacles_07_seven.png",
+  "eight_of_pentacles": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/pentacles_08_eight.png",
+  "nine_of_pentacles": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/pentacles_09_nine.png",
+  "ten_of_pentacles": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/pentacles_10_ten.png",
+  "page_of_pentacles": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/pentacles_11_page.png",
+  "knight_of_pentacles": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/pentacles_12_knight.png",
+  "queen_of_pentacles": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/pentacles_13_queen.png",
+  "king_of_pentacles": "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/pentacles_14_king.png",
 };
 
 export const analyzeSituation = async (userInput: string): Promise<TarotAnalysisResult> => {
   const model = "gemini-2.5-flash"; 
 
+  // Create a comma-separated list of keys for the system instruction
   const validIds = Object.keys(DECK_URLS).join(", ");
 
   const response = await ai.models.generateContent({
@@ -107,12 +108,12 @@ export const analyzeSituation = async (userInput: string): Promise<TarotAnalysis
       Действуй как профессиональный таролог и юнгианский психоаналитик. 
       Проанализируй следующий запрос пользователя: "${userInput}".
       
-      1. Выбери ОДНУ карту из колоды "Путь Героя" (включая уникальные карты Hero и White Card), которая наиболее точно отражает суть ситуации.
-      2. ОБЯЗАТЕЛЬНО выбери 'cardId' из следующего списка: [${validIds}].
+      1. Выбери ОДНУ карту из колоды "Путь Героя" (включая уникальные карты Hero и White Card), которая наиболее точно отражает суть ситуации или подсознательное состояние.
+      2. ОБЯЗАТЕЛЬНО выбери 'cardId' ТОЛЬКО из этого списка ключей: [${validIds}].
       3. Опиши психологический архетип этой карты.
       4. Дай глубокую, персональную психологическую трактовку ситуации через призму этой карты.
       5. Сформулируй краткий совет.
-      6. Создай детальный промпт для генерации изображения (на английском), который смешивает классическую иконографию этой карты с элементами ситуации пользователя. Стиль: мистический реализм, мрачное фэнтези, кинематографичное освещение.
+      6. Создай детальный промпт для генерации изображения (на английском), который смешивает классическую иконографию этой карты с элементами ситуации пользователя. Стиль: мистический реализм, мрачное фэнтези, кинематографичное освещение, 8k.
     `,
     config: {
       responseMimeType: "application/json",
@@ -120,7 +121,7 @@ export const analyzeSituation = async (userInput: string): Promise<TarotAnalysis
         type: Type.OBJECT,
         properties: {
           cardName: { type: Type.STRING },
-          cardId: { type: Type.STRING, description: "Must be one of the keys provided in the list." },
+          cardId: { type: Type.STRING, description: "Must be exactly one of the keys provided in the list." },
           archetype: { type: Type.STRING },
           interpretation: { type: Type.STRING },
           advice: { type: Type.STRING },
@@ -137,8 +138,9 @@ export const analyzeSituation = async (userInput: string): Promise<TarotAnalysis
   
   const parsed = JSON.parse(text) as TarotAnalysisResult;
   
-  // Resolve deck image URL
-  parsed.deckImageUrl = DECK_URLS[parsed.cardId] || DECK_URLS['white_card']; // fallback to white card
+  // Resolve deck image URL based on the ID returned by Gemini
+  // If Gemini returns an invalid ID, fallback to 'rubashka' or 'white_card'
+  parsed.deckImageUrl = DECK_URLS[parsed.cardId] || DECK_URLS['white_card'] || "https://cdn.jsdelivr.net/gh/marataitester-blip/tarot/rubashka.png";
 
   return parsed;
 };
@@ -155,7 +157,7 @@ export const generateTarotImage = async (imagePrompt: string): Promise<string> =
         ]
       },
       config: {
-         imageConfig: { aspectRatio: "1:1" }
+         imageConfig: { aspectRatio: "3:4" } // Portrait aspect ratio for cards
       }
     });
 

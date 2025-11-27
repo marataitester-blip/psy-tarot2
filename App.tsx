@@ -1,10 +1,89 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, ReactNode, ErrorInfo } from 'react';
 import { AppState, TarotAnalysisResult } from './types';
 import { analyzeSituation, generateTarotImage } from './services/geminiService';
 import { LoadingOverlay } from './components/LoadingOverlay';
-import { Sparkles, Share2, RotateCw, Feather } from 'lucide-react';
 
-const App: React.FC = () => {
+// Inline Icons to avoid dependency issues
+const Sparkles = ({ className }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L12 3Z"/>
+  </svg>
+);
+
+const Share2 = ({ className }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <circle cx="18" cy="5" r="3"/>
+    <circle cx="6" cy="12" r="3"/>
+    <circle cx="18" cy="19" r="3"/>
+    <line x1="8.59" x2="15.42" y1="13.51" y2="17.49"/>
+    <line x1="15.41" x2="8.59" y1="6.51" y2="10.49"/>
+  </svg>
+);
+
+const RotateCw = ({ className }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/>
+    <path d="M21 3v5h-5"/>
+  </svg>
+);
+
+const Feather = ({ className }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"/>
+    <line x1="16" x2="2" y1="8" y2="22"/>
+    <line x1="17.5" x2="9" y1="15" y2="15"/>
+  </svg>
+);
+
+interface ErrorBoundaryProps {
+  children?: ReactNode;
+}
+
+interface ErrorBoundaryState {
+  hasError: boolean;
+  error: Error | null;
+}
+
+// Error Boundary to catch crashes
+class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
+  constructor(props: ErrorBoundaryProps) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+
+  static getDerivedStateFromError(error: Error): ErrorBoundaryState {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    console.error("Uncaught error:", error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4 text-center">
+          <div className="bg-red-900/20 border border-red-800 rounded-xl p-6 max-w-md">
+            <h2 className="text-xl text-red-400 font-serif mb-2">Произошла ошибка</h2>
+            <p className="text-slate-400 text-sm mb-4">Приложение столкнулось с неожиданной проблемой.</p>
+            <pre className="text-xs text-red-300/50 overflow-auto text-left bg-black/30 p-2 rounded mb-4">
+              {this.state.error?.message}
+            </pre>
+            <button 
+              onClick={() => window.location.reload()}
+              className="px-4 py-2 bg-red-900/50 hover:bg-red-800 text-red-200 rounded transition"
+            >
+              Перезагрузить
+            </button>
+          </div>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
+const AppContent: React.FC = () => {
   const [state, setState] = useState<AppState>({
     step: 'input',
     userInput: '',
@@ -16,10 +95,16 @@ const App: React.FC = () => {
   const [installPrompt, setInstallPrompt] = useState<any>(null);
 
   useEffect(() => {
-    window.addEventListener('beforeinstallprompt', (e) => {
+    const handleBeforeInstallPrompt = (e: any) => {
       e.preventDefault();
       setInstallPrompt(e);
-    });
+    };
+
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    }
   }, []);
 
   const handleInstall = () => {
@@ -51,12 +136,12 @@ const App: React.FC = () => {
         analysis,
         generatedImageUrl: imageUrl
       }));
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
       setState(prev => ({
         ...prev,
         step: 'input',
-        error: "Духи молчат. Попробуйте сформулировать запрос иначе или повторить попытку позже."
+        error: "Духи молчат. Попробуйте сформулировать запрос иначе или повторить попытку позже. " + (err.message || "")
       }));
     }
   };
@@ -252,5 +337,11 @@ const App: React.FC = () => {
     </div>
   );
 };
+
+const App: React.FC = () => (
+  <ErrorBoundary>
+    <AppContent />
+  </ErrorBoundary>
+);
 
 export default App;

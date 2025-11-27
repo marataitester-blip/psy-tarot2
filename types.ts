@@ -1,5 +1,7 @@
 export interface TarotAnalysisResult {
   cardName: string;
+  cardId: string;
+  deckImageUrl: string;
   archetype: string;
   interpretation: string;
   imagePrompt: string;

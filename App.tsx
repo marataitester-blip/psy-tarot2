@@ -1,4 +1,4 @@
-import React, { useState, useEffect, ReactNode, ErrorInfo } from 'react';
+import React, { useState, useEffect, ReactNode, ErrorInfo, Component } from 'react';
 import { AppState, TarotAnalysisResult } from './types';
 import { analyzeSituation, generateTarotImage } from './services/geminiService';
 import { LoadingOverlay } from './components/LoadingOverlay';
@@ -45,11 +45,14 @@ interface ErrorBoundaryState {
 }
 
 // Error Boundary to catch crashes
-class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
-  state: ErrorBoundaryState = {
-    hasError: false,
-    error: null
-  };
+class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
+  constructor(props: ErrorBoundaryProps) {
+    super(props);
+    this.state = {
+      hasError: false,
+      error: null
+    };
+  }
 
   static getDerivedStateFromError(error: Error): ErrorBoundaryState {
     return { hasError: true, error };
@@ -138,10 +141,20 @@ const AppContent: React.FC = () => {
       }));
     } catch (err: any) {
       console.error(err);
+      
+      let errorMessage = "Духи молчат. Попробуйте сформулировать запрос иначе или повторить попытку позже.";
+      
+      // Check for the specific API Key error we throw in the service
+      if (err.message && (err.message.includes("API Key") || err.message.includes("API_KEY"))) {
+        errorMessage = err.message;
+      } else if (err.message) {
+         errorMessage += " (" + err.message + ")";
+      }
+
       setState(prev => ({
         ...prev,
         step: 'input',
-        error: "Духи молчат. Попробуйте сформулировать запрос иначе или повторить попытку позже. " + (err.message || "")
+        error: errorMessage
       }));
     }
   };

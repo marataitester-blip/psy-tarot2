@@ -4,7 +4,11 @@ import { TarotAnalysisResult } from "../types";
 // Helper to initialize AI only when needed, preventing crashes on module load
 // if process.env is not yet available in the browser context.
 const getAI = () => {
-  return new GoogleGenAI({ apiKey: process.env.API_KEY });
+  const apiKey = process.env.API_KEY;
+  if (!apiKey) {
+    throw new Error("API Key не найден. Пожалуйста, добавьте переменную API_KEY в настройки вашего окружения (Vercel/Environment Variables).");
+  }
+  return new GoogleGenAI({ apiKey });
 };
 
 // Complete mapping of Card IDs to the provided CDN URLs

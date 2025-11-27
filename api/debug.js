@@ -1,7 +1,6 @@
+const { GoogleGenAI } = require("@google/genai");
 
-const { GoogleGenerativeAI } = require("@google/generative-ai");
-
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   const results = {
     timestamp: new Date().toISOString(),
     environment: process.env.NODE_ENV || "development",
@@ -10,8 +9,8 @@ export default async function handler(req, res) {
   };
 
   // 1. ПРОВЕРКА НАЛИЧИЯ КЛЮЧЕЙ
-  // Мы проверяем и API_KEY (который используется в приложении) и специфичные ключи
-  const keysToCheck = ["API_KEY", "GEMINI_API_KEY", "DEEPSEEK_API_KEY"];
+  // Мы проверяем только API_KEY, так как это единственный правильный источник ключа.
+  const keysToCheck = ["API_KEY"];
 
   keysToCheck.forEach(keyName => {
     const value = process.env[keyName];
@@ -27,24 +26,23 @@ export default async function handler(req, res) {
   });
 
   // 2. ТЕСТОВОЕ ПОДКЛЮЧЕНИЕ (PING) К GEMINI
-  // Пытаемся использовать API_KEY или GEMINI_API_KEY
-  const geminiKey = process.env.API_KEY || process.env.GEMINI_API_KEY;
+  const apiKey = process.env.API_KEY;
 
-  if (geminiKey) {
+  if (apiKey) {
     try {
-      const genAI = new GoogleGenerativeAI(geminiKey);
-      // Используем самую легкую модель для теста
-      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+      const ai = new GoogleGenAI({ apiKey });
+      // Используем корректную модель для простых текстовых задач согласно гайдлайнам
+      const response = await ai.models.generateContent({
+        model: 'gemini-2.5-flash',
+        contents: "Reply with only the word 'OK'.",
+      });
       
-      const prompt = "Reply with only the word 'OK'.";
-      const result = await model.generateContent(prompt);
-      const response = await result.response;
-      const text = response.text();
+      const text = response.text;
       
       results.connectivity.gemini = {
         status: "OK",
         message: "Connection successful",
-        modelResponse: text.trim()
+        modelResponse: text ? text.trim() : "No text returned"
       };
     } catch (error) {
       results.connectivity.gemini = {
@@ -56,10 +54,10 @@ export default async function handler(req, res) {
   } else {
     results.connectivity.gemini = {
       status: "SKIPPED",
-      message: "No valid Gemini key found to test connection"
+      message: "No API_KEY found to test connection"
     };
   }
 
   // Возвращаем результат
   res.status(200).json(results);
-}
+};

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, ReactNode, ErrorInfo } from 'react';
-import { AppState, TarotAnalysisResult } from './types';
+import { AppState } from './types';
 import { analyzeSituation, generateTarotImage } from './services/geminiService';
 import { LoadingOverlay } from './components/LoadingOverlay';
 
@@ -46,7 +46,8 @@ interface ErrorBoundaryState {
 
 // Error Boundary to catch crashes
 class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
-  readonly props: Readonly<ErrorBoundaryProps>;
+  // Explicitly declaring props to avoid TS errors in strict environments
+  declare props: Readonly<ErrorBoundaryProps>;
 
   public state: ErrorBoundaryState = {
     hasError: false,
@@ -55,7 +56,6 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
 
   constructor(props: ErrorBoundaryProps) {
     super(props);
-    this.props = props;
   }
 
   static getDerivedStateFromError(error: Error): ErrorBoundaryState {
@@ -148,10 +148,7 @@ const AppContent: React.FC = () => {
       
       let errorMessage = "Духи молчат. Попробуйте сформулировать запрос иначе или повторить попытку позже.";
       
-      // Check for the specific API Key error we throw in the service
-      if (err.message && (err.message.includes("API Key") || err.message.includes("API_KEY"))) {
-        errorMessage = err.message;
-      } else if (err.message) {
+      if (err.message) {
          errorMessage += " (" + err.message + ")";
       }
 

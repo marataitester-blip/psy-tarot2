@@ -1,7 +1,11 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { TarotAnalysisResult } from "../types";
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+// Helper to initialize AI only when needed, preventing crashes on module load
+// if process.env is not yet available in the browser context.
+const getAI = () => {
+  return new GoogleGenAI({ apiKey: process.env.API_KEY });
+};
 
 // Complete mapping of Card IDs to the provided CDN URLs
 const DECK_URLS: Record<string, string> = {
@@ -98,6 +102,7 @@ const DECK_URLS: Record<string, string> = {
 
 export const analyzeSituation = async (userInput: string): Promise<TarotAnalysisResult> => {
   const model = "gemini-2.5-flash"; 
+  const ai = getAI();
 
   // Create a comma-separated list of keys for the system instruction
   const validIds = Object.keys(DECK_URLS).join(", ");
@@ -147,6 +152,7 @@ export const analyzeSituation = async (userInput: string): Promise<TarotAnalysis
 
 export const generateTarotImage = async (imagePrompt: string): Promise<string> => {
   const model = "gemini-2.5-flash-image";
+  const ai = getAI();
 
   try {
     const response = await ai.models.generateContent({

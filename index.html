@@ -28,7 +28,7 @@
       }
     </script>
 
-    <!-- PWA Manifest (Removed start_url to avoid invalid URL errors) -->
+    <!-- PWA Manifest -->
     <link rel="manifest" href="data:application/manifest+json;base64,eyJuYW1lIjoiU291bFRhcm90Iiwic2hvcnRfbmFtZSI6IlNvdWxUYXJvdCIsImRpc3BsYXkiOiJzdGFuZGFsb25lIiwiYmFja2dyb3VuZF9jb2xvciI6IiMwMjA2MTciLCJ0aGVtZV9jb2xvciI6IiMwMjA2MTciLCJpY29ucyI6W3sic3JjIjoiaHR0cHM6Ly9jZG4uanNkZWxpdnIubmV0L2doL21hcmF0YWl0ZXN0ZXItYmxpcC90YXJvdC9ydWJhc2hrYS5wbmciLCJzaXplcyI6IjE5MngxOTIiLCJ0eXBlIjoiaW1hZ2UvcG5nIn1dfQ==" />
     
     <style>
@@ -67,5 +67,7 @@
   </head>
   <body>
     <div id="root"></div>
+    <!-- Entry Point Script -->
+    <script type="module" src="./index.tsx"></script>
   </body>
 </html>
